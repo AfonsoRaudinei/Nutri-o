@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Plano Nutricional</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;
+  background:#F5F5F7;color:#1D1D1F;padding:16px
+}
+h1{font-size:18px;margin-bottom:12px}
+h3{font-size:11px;color:#6B7280;margin:20px 0 8px}
+label{font-size:11px;color:#6B7280;margin-top:8px;display:block}
+.card{
+  background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;
+  box-shadow:0 1px 6px rgba(0,0,0,.08)
+}
+input,select{
+  width:100%;padding:8px;border:1px solid #D1D5DB;border-radius:8px
+}
+input.small{width:80px;text-align:center}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:6px;border-bottom:1px solid #E5E7EB;font-size:12px;text-align:center}
+th{color:#6B7280}
+button{
+  padding:10px;border:none;border-radius:10px;
+  background:#007AFF;color:#fff;font-weight:600;cursor:pointer
+}
+button.alt{background:#6B7280}
+.remove{cursor:pointer;color:#EF4444;font-weight:bold}
+.status-ok{background:#DCFCE7}
+.status-warn{background:#FEF3C7}
+.status-bad{background:#FEE2E2}
+nav{display:flex;gap:8px;margin-bottom:12px}
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+
+<nav class="no-print">
+<button onclick="showPage('plan')">Plano Nutricional</button>
+<button class="alt" onclick="showPage('products')">Cadastro de Produtos</button>
+</nav>
+
+<!-- ================= PLANO ================= -->
+<div id="planPage">
+
+<div class="card">
+<h1>Plano Nutricional</h1>
+<label>Cliente</label>
+<input>
+<label>Cultura</label>
+<input>
+</div>
+
+<div class="card">
+<h3>Nutrientes Alvo (g/ha)</h3>
+<select id="nutSelect">
+<option value="">Adicionar nutriente</option>
+</select>
+<table id="targets">
+<tr><th>Nutriente</th><th>Alvo</th><th></th></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>Produtos</h3>
+<select id="prodSelect">
+<option value="">Adicionar produto</option>
+</select>
+<table id="products">
+<tr>
+<th>Usar</th><th>Produto</th><th>Dose</th>
+<th>N</th><th>P₂O₅</th><th>K₂O</th><th>CaO</th><th>MgO</th>
+<th>Zn</th><th>Mn</th><th>Cu</th><th>Fe</th><th>B</th><th>Mo</th><th>Co</th><th>Ni</th>
+<th></th>
+</tr>
+</table>
+</div>
+
+<div class="card">
+<h3>Resultado</h3>
+<table id="status">
+<tr><th>Nutriente</th><th>Alvo</th><th>Entregue</th><th>Status</th></tr>
+</table>
+</div>
+
+<button onclick="exportPDF()">Exportar PDF</button>
+</div>
+
+<!-- ================= CADASTRO ================= -->
+<div id="productsPage" class="hidden">
+
+<div class="card">
+<h1>Cadastro de Produto</h1>
+
+<label>Nome do produto</label>
+<input id="pName">
+
+<label>Unidade (ex: L/ha, kg/ha)</label>
+<input id="pUnit">
+
+<h3>Concentração (g por unidade)</h3>
+<div id="nutInputs"></div>
+
+<button onclick="saveProduct()">Salvar Produto</button>
+</div>
+
+<div class="card">
+<h3>Produtos Cadastrados</h3>
+<table id="listProducts">
+<tr><th>Produto</th><th>Unidade</th><th></th></tr>
+</table>
+</div>
+
+</div>
+
+<script>
+const nutrients=["N","P2O5","K2O","CaO","MgO","Zn","Mn","Cu","Fe","B","Mo","Co","Ni"];
+
+const nutSelect=document.getElementById("nutSelect");
+const prodSelect=document.getElementById("prodSelect");
+const targets=document.getElementById("targets");
+const products=document.getElementById("products");
+const statusTb=document.getElementById("status");
+
+nutrients.forEach(n=>{
+ nutSelect.innerHTML+=`<option>${n}</option>`;
+ document.getElementById("nutInputs").innerHTML+=
+  `<label>${n}</label><input id="nut_${n}" class="small">`;
+});
+
+function loadProducts(){
+ return JSON.parse(localStorage.getItem("products")||"[]");
+}
+function saveProducts(list){
+ localStorage.setItem("products",JSON.stringify(list));
+}
+
+function refreshProducts(){
+ prodSelect.innerHTML='<option value="">Adicionar produto</option>';
+ document.getElementById("listProducts").innerHTML=
+ '<tr><th>Produto</th><th>Unidade</th><th></th></tr>';
+ loadProducts().forEach(p=>{
+  prodSelect.innerHTML+=`<option>${p.nome}</option>`;
+  document.getElementById("listProducts").innerHTML+=
+   `<tr><td>${p.nome}</td><td>${p.unidade}</td>
+   <td class="remove" onclick="removeProduct('${p.nome}')">✕</td></tr>`;
+ });
+}
+
+function saveProduct(){
+ const p={nome:pName.value,unidade:pUnit.value};
+ nutrients.forEach(n=>{
+  const v=parseFloat(document.getElementById("nut_"+n).value);
+  if(v)p[n]=v;
+ });
+ const list=loadProducts();
+ list.push(p);
+ saveProducts(list);
+ refreshProducts();
+ alert("Produto salvo");
+}
+
+function removeProduct(name){
+ saveProducts(loadProducts().filter(p=>p.nome!==name));
+ refreshProducts();
+}
+
+nutSelect.onchange=()=>{
+ if(!nutSelect.value)return;
+ targets.innerHTML+=
+ `<tr data-n="${nutSelect.value}">
+ <td>${nutSelect.value}</td>
+ <td><input class="small"></td>
+ <td class="remove" onclick="this.parentNode.remove();calc()">✕</td>
+ </tr>`;
+ nutSelect.value="";
+ calc();
+};
+
+prodSelect.onchange=()=>{
+ const p=loadProducts().find(x=>x.nome===prodSelect.value);
+ if(!p)return;
+ let html=`<tr data-p="${p.nome}">
+ <td><input type="checkbox" checked></td>
+ <td>${p.nome}</td>
+ <td><input class="small"> ${p.unidade}</td>`;
+ nutrients.forEach(n=>html+=`<td>${p[n]??"—"}</td>`);
+ html+=`<td class="remove" onclick="this.parentNode.remove();calc()">✕</td></tr>`;
+ products.innerHTML+=html;
+ prodSelect.value="";
+ calc();
+};
+
+document.body.addEventListener("input",calc);
+document.body.addEventListener("change",calc);
+
+function calc(){
+ const alvo={},total={};
+ document.querySelectorAll("#targets tr[data-n]").forEach(r=>{
+  alvo[r.dataset.n]=parseFloat(r.querySelector("input").value)||0;
+ });
+ document.querySelectorAll("#products tr[data-p]").forEach(r=>{
+  if(!r.cells[0].querySelector("input").checked)return;
+  const dose=parseFloat(r.cells[2].querySelector("input").value)||0;
+  nutrients.forEach((n,i)=>{
+   const v=r.cells[3+i].innerText;
+   if(v!=="—"&&alvo[n]!=null)
+    total[n]=(total[n]||0)+dose*parseFloat(v);
+  });
+ });
+ statusTb.innerHTML='<tr><th>Nutriente</th><th>Alvo</th><th>Entregue</th><th>Status</th></tr>';
+ Object.keys(alvo).forEach(n=>{
+  const a=alvo[n],e=total[n]||0,p=a?e/a:0;
+  let cls="status-bad",t="🔴";
+  if(p>=1){cls="status-ok";t="🟢";}
+  else if(p>=0.8){cls="status-warn";t="🟡";}
+  statusTb.innerHTML+=
+  `<tr class="${cls}"><td>${n}</td><td>${a}</td><td>${e.toFixed(1)}</td><td>${t}</td></tr>`;
+ });
+}
+
+function exportPDF(){
+ html2pdf().from(document.body).set({
+  margin:10,filename:"Plano_Nutricional.pdf",
+  jsPDF:{unit:"mm",format:"a4"}
+ }).save();
+}
+
+function showPage(p){
+ planPage.classList.toggle("hidden",p!=="plan");
+ productsPage.classList.toggle("hidden",p!=="products");
+}
+
+refreshProducts();
+</script>
+
+</body>
+</html>
