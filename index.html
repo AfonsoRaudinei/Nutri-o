@@ -2,243 +2,1434 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Plano Nutricional</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plano Nutricional – Versão Livre</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial;
-  background:#F5F5F7;color:#1D1D1F;padding:16px
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-h1{font-size:18px;margin-bottom:12px}
-h3{font-size:11px;color:#6B7280;margin:20px 0 8px}
-label{font-size:11px;color:#6B7280;margin-top:8px;display:block}
-.card{
-  background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;
-  box-shadow:0 1px 6px rgba(0,0,0,.08)
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(180deg, #F5F5F7 0%, #E5E5E7 100%);
+  color: #1D1D1F;
+  padding-bottom: 100px;
 }
-input,select{
-  width:100%;padding:8px;border:1px solid #D1D5DB;border-radius:8px
+
+/* TABS */
+.tab-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  gap: 0;
 }
-input.small{width:80px;text-align:center}
-table{width:100%;border-collapse:collapse;margin-top:10px}
-th,td{padding:6px;border-bottom:1px solid #E5E7EB;font-size:12px;text-align:center}
-th{color:#6B7280}
-button{
-  padding:10px;border:none;border-radius:10px;
-  background:#007AFF;color:#fff;font-weight:600;cursor:pointer
+
+.tab-button {
+  flex: 1;
+  max-width: 300px;
+  padding: 16px 20px;
+  border: none;
+  background: transparent;
+  color: #86868B;
+  font-size: 0.9em;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
 }
-button.alt{background:#6B7280}
-.remove{cursor:pointer;color:#EF4444;font-weight:bold}
-.status-ok{background:#DCFCE7}
-.status-warn{background:#FEF3C7}
-.status-bad{background:#FEE2E2}
-nav{display:flex;gap:8px;margin-bottom:12px}
-.hidden{display:none}
+
+.tab-button.active {
+  color: #007AFF;
+  border-bottom-color: #007AFF;
+}
+
+.tab-content {
+  display: none;
+  padding: 80px 20px 20px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #1D1D1F;
+  margin-bottom: 4px;
+}
+
+.header p {
+  font-size: 0.85em;
+  color: #86868B;
+}
+
+/* CARD */
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-title {
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #86868B;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+/* FORMS */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9em;
+  color: #86868B;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #D1D1D6;
+  border-radius: 8px;
+  font-size: 0.95em;
+  font-family: inherit;
+  background: white;
+  transition: all 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  outline: none;
+  border-color: #007AFF;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.input-small {
+  width: 80px;
+  text-align: center;
+}
+
+.dropdown-add {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #D1D1D6;
+  border-radius: 8px;
+  font-size: 0.95em;
+  background: white;
+  cursor: pointer;
+}
+
+/* TABLES */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 0.9em;
+}
+
+th {
+  text-align: left;
+  padding: 12px 8px;
+  color: #86868B;
+  font-weight: 600;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #E5E5E7;
+}
+
+td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #F5F5F7;
+  vertical-align: middle;
+}
+
+.nutrient-row td:first-child,
+.product-name {
+  font-weight: 600;
+  color: #1D1D1F;
+}
+
+.product-row {
+  vertical-align: middle;
+}
+
+.product-unit {
+  font-size: 0.85em;
+  color: #86868B;
+}
+
+/* BADGES */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.7em;
+  border-radius: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: 6px;
+}
+
+.badge-macro {
+  background: #E0F2FE;
+  color: #0369A1;
+  border: 1px solid #7DD3FC;
+}
+
+/* STATUS */
+.status-ok {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-warn {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.status-bad {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.status-neutral {
+  background: #F5F5F7;
+  color: #86868B;
+}
+
+/* BUTTONS */
+.btn-remove {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #FF3B30;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-remove:hover {
+  background: rgba(255, 59, 48, 0.1);
+}
+
+.checkbox-cell {
+  text-align: center;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.result-table td {
+  padding: 16px 8px;
+  font-size: 0.95em;
+}
+
+.result-table .nutrient-col {
+  font-weight: 600;
+  color: #1D1D1F;
+}
+
+.result-table .value-col {
+  text-align: right;
+  font-weight: 500;
+}
+
+.result-table .status-col {
+  text-align: center;
+  font-size: 1.2em;
+}
+
+/* FAB */
+.fab {
+  position: fixed;
+  bottom: 70px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  color: white;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+}
+
+.fab-pdf {
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+}
+
+.fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.5);
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #86868B;
+  font-size: 0.9em;
+}
+
+.empty-state-icon {
+  font-size: 3em;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+/* NUTRIENT GRID */
+.nutrient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.nutrient-value {
+  text-align: center;
+  font-size: 0.75em;
+  padding: 6px 4px;
+  background: #F5F5F7;
+  border-radius: 6px;
+}
+
+.nutrient-value strong {
+  display: block;
+  color: #1D1D1F;
+  font-size: 1.1em;
+  margin-bottom: 2px;
+}
+
+.nutrient-value span {
+  color: #86868B;
+  font-size: 0.85em;
+}
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #1D1D1F;
+}
+
+.btn-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #E5E5E7;
+  border-radius: 16px;
+  font-size: 20px;
+  color: #86868B;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  background: #D1D1D6;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  color: white;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #E5E5E7;
+  color: #86868B;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.btn-secondary:hover {
+  background: #D1D1D6;
+}
+
+.nutrient-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nutrient-item label {
+  font-size: 0.85em;
+  color: #86868B;
+  font-weight: 500;
+}
+
+.nutrient-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.checkbox-group label {
+  margin: 0;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #E0F2FE;
+  color: #0369A1;
+}
+
+.btn-edit:hover {
+  background: #BAE6FD;
+}
+
+.btn-delete {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.btn-delete:hover {
+  background: #FECACA;
+}
+
+.nutrient-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.nutrient-chip {
+  background: #F5F5F7;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75em;
+  color: #1D1D1F;
+}
+
+/* FOOTER */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  padding: 12px 20px;
+  z-index: 80;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.footer-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.footer-name {
+  font-size: 0.85em;
+  font-weight: 500;
+  color: #1D1D1F;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  cursor: text;
+  transition: all 0.2s;
+  min-width: 120px;
+}
+
+.footer-name:hover,
+.footer-name:focus {
+  color: #007AFF;
+  outline: none;
+}
+
+.footer-name::placeholder {
+  color: #C7C7CC;
+}
+
+.footer-divider {
+  width: 1px;
+  height: 16px;
+  background: #E5E5E7;
+}
+
+.footer-contact {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.85em;
+}
+
+.footer-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #86868B;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.footer-contact-item:hover {
+  color: #007AFF;
+}
+
+.footer-phone-input {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+  cursor: text;
+  transition: all 0.2s;
+  width: 130px;
+}
+
+.footer-phone-input:hover,
+.footer-phone-input:focus {
+  outline: none;
+  color: #007AFF;
+}
+
+.footer-phone-input::placeholder {
+  color: #C7C7CC;
+}
+
+.no-print {
+  display: block;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .tab-bar {
+    display: none !important;
+  }
+  body {
+    background: white;
+    padding: 20px;
+  }
+  .tab-content {
+    padding: 20px;
+  }
+  .card {
+    box-shadow: none;
+    border: 1px solid #E5E5E7;
+  }
+}
+
+@media (max-width: 768px) {
+  .tab-content {
+    padding: 80px 12px 12px;
+  }
+  
+  .card {
+    padding: 16px;
+  }
+  
+  table {
+    font-size: 0.85em;
+  }
+  
+  th, td {
+    padding: 8px 4px;
+  }
+  
+  .fab {
+    bottom: 60px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+  }
+  
+  .nutrient-grid,
+  .nutrient-form-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  
+  .footer {
+    padding: 12px 16px;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .footer-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .footer-divider {
+    display: none;
+  }
+  
+  .footer-contact {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #F5F5F7;
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #D1D1D6;
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #86868B;
+}
 </style>
 </head>
-
 <body>
 
-<nav class="no-print">
-<button onclick="showPage('plan')">Plano Nutricional</button>
-<button class="alt" onclick="showPage('products')">Cadastro de Produtos</button>
-</nav>
-
-<!-- ================= PLANO ================= -->
-<div id="planPage">
-
-<div class="card">
-<h1>Plano Nutricional</h1>
-<label>Cliente</label>
-<input>
-<label>Cultura</label>
-<input>
+<!-- TAB BAR -->
+<div class="tab-bar no-print">
+  <button class="tab-button active" onclick="switchTab('plano')">📊 Plano Nutricional</button>
+  <button class="tab-button" onclick="switchTab('produtos')">⚙️ Gerenciar Produtos</button>
 </div>
 
-<div class="card">
-<h3>Nutrientes Alvo (g/ha)</h3>
-<select id="nutSelect">
-<option value="">Adicionar nutriente</option>
-</select>
-<table id="targets">
-<tr><th>Nutriente</th><th>Alvo</th><th></th></tr>
-</table>
+<!-- TAB 1: PLANO NUTRICIONAL -->
+<div id="tab-plano" class="tab-content active">
+  <div class="header">
+    <h1>Plano Nutricional</h1>
+    <p>Sistema de Nutrição Inteligente</p>
+  </div>
+
+  <!-- INFORMAÇÕES DO CLIENTE -->
+  <div class="card no-print">
+    <div class="form-group">
+      <label>Cliente</label>
+      <input type="text" id="clienteInput" placeholder="Nome do produtor">
+    </div>
+    
+    <div class="form-group">
+      <label>Cultura</label>
+      <input type="text" id="culturaInput" placeholder="Ex: Soja, Milho, Algodão">
+    </div>
+  </div>
+
+  <!-- NUTRIENTES ALVO -->
+  <div class="card no-print">
+    <div class="section-title">Nutrientes Alvo (g/ha)</div>
+    
+    <select id="nutSelect" class="dropdown-add">
+      <option value="">+ Adicionar nutriente</option>
+      <option value="N">Nitrogênio (N)</option>
+      <option value="P2O5">Fósforo (P₂O₅)</option>
+      <option value="K2O">Potássio (K₂O)</option>
+      <option value="CaO">Cálcio (CaO)</option>
+      <option value="MgO">Magnésio (MgO)</option>
+      <option value="Zn">Zinco (Zn)</option>
+      <option value="Mn">Manganês (Mn)</option>
+      <option value="Cu">Cobre (Cu)</option>
+      <option value="Fe">Ferro (Fe)</option>
+      <option value="B">Boro (B)</option>
+      <option value="Mo">Molibdênio (Mo)</option>
+      <option value="Co">Cobalto (Co)</option>
+      <option value="Ni">Níquel (Ni)</option>
+    </select>
+    
+    <table id="targetTable">
+      <thead>
+        <tr>
+          <th>Nutriente</th>
+          <th style="text-align: center;">Alvo (g/ha)</th>
+          <th style="width: 40px;"></th>
+        </tr>
+      </thead>
+      <tbody id="targetBody"></tbody>
+    </table>
+    
+    <div id="targetEmpty" class="empty-state">
+      Nenhum nutriente adicionado
+    </div>
+  </div>
+
+  <!-- PRODUTOS -->
+  <div class="card no-print">
+    <div class="section-title">Produtos</div>
+    
+    <select id="prodSelect" class="dropdown-add">
+      <option value="">+ Adicionar produto</option>
+    </select>
+    
+    <table id="productTable" style="display: none;">
+      <thead>
+        <tr>
+          <th style="width: 40px; text-align: center;">Usar</th>
+          <th>Produto</th>
+          <th style="text-align: center; width: 100px;">Dose</th>
+          <th style="width: 40px;"></th>
+        </tr>
+      </thead>
+      <tbody id="productBody"></tbody>
+    </table>
+    
+    <div id="productEmpty" class="empty-state">
+      Nenhum produto adicionado
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="card">
+    <div class="section-title">Resultado do Plano</div>
+    
+    <table class="result-table" id="resultTable">
+      <thead>
+        <tr>
+          <th>Nutriente</th>
+          <th style="text-align: right;">Alvo</th>
+          <th style="text-align: right;">Entregue</th>
+          <th style="text-align: right;">Excesso</th>
+          <th style="text-align: center; width: 60px;">Status</th>
+        </tr>
+      </thead>
+      <tbody id="resultBody"></tbody>
+    </table>
+    
+    <div id="resultEmpty" class="empty-state">
+      Adicione nutrientes e produtos para ver o resultado
+    </div>
+  </div>
+
+  <button class="fab fab-pdf no-print" onclick="exportPDF()" title="Exportar PDF">
+    📄
+  </button>
 </div>
 
-<div class="card">
-<h3>Produtos</h3>
-<select id="prodSelect">
-<option value="">Adicionar produto</option>
-</select>
-<table id="products">
-<tr>
-<th>Usar</th><th>Produto</th><th>Dose</th>
-<th>N</th><th>P₂O₅</th><th>K₂O</th><th>CaO</th><th>MgO</th>
-<th>Zn</th><th>Mn</th><th>Cu</th><th>Fe</th><th>B</th><th>Mo</th><th>Co</th><th>Ni</th>
-<th></th>
-</tr>
-</table>
+<!-- TAB 2: GERENCIAR PRODUTOS -->
+<div id="tab-produtos" class="tab-content">
+  <div class="header">
+    <h1>Gerenciar Produtos</h1>
+    <p>Cadastro de Produtos</p>
+  </div>
+
+  <!-- LISTA DE PRODUTOS -->
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div class="section-title" style="margin-bottom: 0;">Produtos Cadastrados</div>
+      <button onclick="openModal()" style="padding: 6px 12px; border: none; border-radius: 8px; background: #E5E5E7; color: #1D1D1F; font-size: 0.85em; font-weight: 500; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#D1D1D6'" onmouseout="this.style.background='#E5E5E7'">
+        + Novo Produto
+      </button>
+    </div>
+    
+    <table id="adminProductTable">
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Composição</th>
+          <th style="width: 140px; text-align: center;">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="adminProductBody"></tbody>
+    </table>
+    
+    <div id="adminEmptyState" class="empty-state" style="display: none;">
+      <div class="empty-state-icon">📦</div>
+      <div>Nenhum produto cadastrado</div>
+      <p style="margin-top: 8px; font-size: 0.85em;">Clique em "Novo Produto" para começar</p>
+    </div>
+  </div>
 </div>
 
-<div class="card">
-<h3>Resultado</h3>
-<table id="status">
-<tr><th>Nutriente</th><th>Alvo</th><th>Entregue</th><th>Status</th></tr>
-</table>
+<!-- MODAL DE CADASTRO/EDIÇÃO -->
+<div class="modal" id="productModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">Novo Produto</h2>
+      <button class="btn-close" onclick="closeModal()">×</button>
+    </div>
+    
+    <form id="productForm" onsubmit="saveProduct(event)">
+      <input type="hidden" id="editIndex" value="">
+      
+      <div class="form-group">
+        <label>Nome do Produto *</label>
+        <input type="text" id="nomeProduto" required placeholder="Ex: PowerMicros">
+      </div>
+      
+      <div class="form-group">
+        <label>Unidade *</label>
+        <select id="unidadeProduto" required>
+          <option value="">Selecione</option>
+          <option value="L/ha">L/ha</option>
+          <option value="kg/ha">kg/ha</option>
+          <option value="g/ha">g/ha</option>
+          <option value="mL/ha">mL/ha</option>
+        </select>
+      </div>
+      
+      <div class="checkbox-group">
+        <input type="checkbox" id="macroFisiologico">
+        <label for="macroFisiologico">Produto Macro Fisiológico</label>
+      </div>
+      
+      <div class="form-group">
+        <label>Composição Nutricional (g/L ou g/kg)</label>
+        <div class="section-title" style="margin-top: 12px; margin-bottom: 8px;">Macronutrientes</div>
+        <div class="nutrient-form-grid">
+          <div class="nutrient-item">
+            <label>N</label>
+            <input type="number" id="nutrient_N" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>P₂O₅</label>
+            <input type="number" id="nutrient_P2O5" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>K₂O</label>
+            <input type="number" id="nutrient_K2O" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>CaO</label>
+            <input type="number" id="nutrient_CaO" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>MgO</label>
+            <input type="number" id="nutrient_MgO" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+        </div>
+        
+        <div class="section-title" style="margin-top: 20px; margin-bottom: 8px;">Micronutrientes</div>
+        <div class="nutrient-form-grid">
+          <div class="nutrient-item">
+            <label>Zn</label>
+            <input type="number" id="nutrient_Zn" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>Mn</label>
+            <input type="number" id="nutrient_Mn" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>Cu</label>
+            <input type="number" id="nutrient_Cu" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>Fe</label>
+            <input type="number" id="nutrient_Fe" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>B</label>
+            <input type="number" id="nutrient_B" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>Mo</label>
+            <input type="number" id="nutrient_Mo" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>Co</label>
+            <input type="number" id="nutrient_Co" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+          <div class="nutrient-item">
+            <label>Ni</label>
+            <input type="number" id="nutrient_Ni" class="input-small" min="0" step="0.1" placeholder="0">
+          </div>
+        </div>
+      </div>
+      
+      <button type="submit" class="btn-primary" id="btnSave">Salvar Produto</button>
+      <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+    </form>
+  </div>
 </div>
 
-<button onclick="exportPDF()">Exportar PDF</button>
-</div>
-
-<!-- ================= CADASTRO ================= -->
-<div id="productsPage" class="hidden">
-
-<div class="card">
-<h1>Cadastro de Produto</h1>
-
-<label>Nome do produto</label>
-<input id="pName">
-
-<label>Unidade (ex: L/ha, kg/ha)</label>
-<input id="pUnit">
-
-<h3>Concentração (g por unidade)</h3>
-<div id="nutInputs"></div>
-
-<button onclick="saveProduct()">Salvar Produto</button>
-</div>
-
-<div class="card">
-<h3>Produtos Cadastrados</h3>
-<table id="listProducts">
-<tr><th>Produto</th><th>Unidade</th><th></th></tr>
-</table>
-</div>
-
-</div>
+<!-- FOOTER -->
+<footer class="footer no-print">
+  <div class="footer-content">
+    <div class="footer-info">
+      <input 
+        type="text" 
+        class="footer-name" 
+        id="footerName" 
+        placeholder="Seu nome"
+        onblur="saveFooterInfo()"
+      >
+      <span class="footer-divider"></span>
+      <span style="font-size: 0.75em; color: #86868B;">Consultor Técnico</span>
+    </div>
+    
+    <div class="footer-contact">
+      <a href="tel:+5500000000000" id="footerPhoneLink" class="footer-contact-item">
+        <span>📞</span>
+        <input 
+          type="text" 
+          class="footer-phone-input" 
+          id="footerPhone" 
+          placeholder="(00) 00000-0000"
+          onblur="saveFooterInfo()"
+        >
+      </a>
+    </div>
+  </div>
+</footer>
 
 <script>
-const nutrients=["N","P2O5","K2O","CaO","MgO","Zn","Mn","Cu","Fe","B","Mo","Co","Ni"];
+const nutrients = ["N", "P2O5", "K2O", "CaO", "MgO", "Zn", "Mn", "Cu", "Fe", "B", "Mo", "Co", "Ni"];
 
-const nutSelect=document.getElementById("nutSelect");
-const prodSelect=document.getElementById("prodSelect");
-const targets=document.getElementById("targets");
-const products=document.getElementById("products");
-const statusTb=document.getElementById("status");
+// INICIALIZAR LOCALSTORAGE SEM PRODUTOS PRÉ-CADASTRADOS
+if (!localStorage.getItem('produtosLivres')) {
+  localStorage.setItem('produtosLivres', JSON.stringify([]));
+}
 
-nutrients.forEach(n=>{
- nutSelect.innerHTML+=`<option>${n}</option>`;
- document.getElementById("nutInputs").innerHTML+=
-  `<label>${n}</label><input id="nut_${n}" class="small">`;
+// Inicializar dados do consultor
+if (!localStorage.getItem('consultorInfoLivre')) {
+  localStorage.setItem('consultorInfoLivre', JSON.stringify({
+    nome: '',
+    telefone: ''
+  }));
+}
+
+let produtosLivres = JSON.parse(localStorage.getItem('produtosLivres') || '[]');
+
+// Carregar informações do rodapé
+function loadFooterInfo() {
+  const info = JSON.parse(localStorage.getItem('consultorInfoLivre') || '{}');
+  
+  document.getElementById('footerName').value = info.nome || '';
+  document.getElementById('footerPhone').value = info.telefone || '';
+  
+  const phoneClean = info.telefone ? info.telefone.replace(/\D/g, '') : '';
+  
+  if (phoneClean) {
+    document.getElementById('footerPhoneLink').href = `tel:+55${phoneClean}`;
+  }
+}
+
+// Salvar informações do rodapé
+function saveFooterInfo() {
+  const nome = document.getElementById('footerName').value;
+  const telefone = document.getElementById('footerPhone').value;
+  
+  const info = {
+    nome: nome,
+    telefone: telefone
+  };
+  
+  localStorage.setItem('consultorInfoLivre', JSON.stringify(info));
+  loadFooterInfo();
+}
+
+loadFooterInfo();
+
+// NAVEGAÇÃO ENTRE TABS
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  
+  if (tabName === 'plano') {
+    document.querySelector('.tab-button:nth-child(1)').classList.add('active');
+    document.getElementById('tab-plano').classList.add('active');
+  } else {
+    document.querySelector('.tab-button:nth-child(2)').classList.add('active');
+    document.getElementById('tab-produtos').classList.add('active');
+    loadAdminProducts();
+  }
+}
+
+// ========== PLANO NUTRICIONAL ==========
+
+const prodSelect = document.getElementById("prodSelect");
+
+function refreshProductDropdown() {
+  produtosLivres = JSON.parse(localStorage.getItem('produtosLivres') || '[]');
+  prodSelect.innerHTML = '<option value="">+ Adicionar produto</option>';
+  produtosLivres.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.nome;
+    opt.textContent = p.nome;
+    prodSelect.appendChild(opt);
+  });
+}
+
+refreshProductDropdown();
+
+// ADICIONAR NUTRIENTE ALVO
+document.getElementById("nutSelect").addEventListener("change", function() {
+  const nutriente = this.value;
+  if (!nutriente) return;
+  
+  if (document.querySelector(`#targetBody tr[data-nutrient="${nutriente}"]`)) {
+    alert("Este nutriente já foi adicionado");
+    this.value = "";
+    return;
+  }
+  
+  const tbody = document.getElementById("targetBody");
+  const tr = document.createElement("tr");
+  tr.className = "nutrient-row";
+  tr.dataset.nutrient = nutriente;
+  
+  tr.innerHTML = `
+    <td>${nutriente}</td>
+    <td style="text-align: center;">
+      <input type="number" class="input-small" min="0" step="0.1" placeholder="0">
+    </td>
+    <td style="text-align: center;">
+      <button class="btn-remove" onclick="removeTarget(this)">×</button>
+    </td>
+  `;
+  
+  tbody.appendChild(tr);
+  document.getElementById("targetEmpty").style.display = "none";
+  this.value = "";
+  
+  tr.querySelector("input").addEventListener("input", calcular);
+  calcular();
 });
 
-function loadProducts(){
- return JSON.parse(localStorage.getItem("products")||"[]");
-}
-function saveProducts(list){
- localStorage.setItem("products",JSON.stringify(list));
-}
-
-function refreshProducts(){
- prodSelect.innerHTML='<option value="">Adicionar produto</option>';
- document.getElementById("listProducts").innerHTML=
- '<tr><th>Produto</th><th>Unidade</th><th></th></tr>';
- loadProducts().forEach(p=>{
-  prodSelect.innerHTML+=`<option>${p.nome}</option>`;
-  document.getElementById("listProducts").innerHTML+=
-   `<tr><td>${p.nome}</td><td>${p.unidade}</td>
-   <td class="remove" onclick="removeProduct('${p.nome}')">✕</td></tr>`;
- });
-}
-
-function saveProduct(){
- const p={nome:pName.value,unidade:pUnit.value};
- nutrients.forEach(n=>{
-  const v=parseFloat(document.getElementById("nut_"+n).value);
-  if(v)p[n]=v;
- });
- const list=loadProducts();
- list.push(p);
- saveProducts(list);
- refreshProducts();
- alert("Produto salvo");
-}
-
-function removeProduct(name){
- saveProducts(loadProducts().filter(p=>p.nome!==name));
- refreshProducts();
-}
-
-nutSelect.onchange=()=>{
- if(!nutSelect.value)return;
- targets.innerHTML+=
- `<tr data-n="${nutSelect.value}">
- <td>${nutSelect.value}</td>
- <td><input class="small"></td>
- <td class="remove" onclick="this.parentNode.remove();calc()">✕</td>
- </tr>`;
- nutSelect.value="";
- calc();
-};
-
-prodSelect.onchange=()=>{
- const p=loadProducts().find(x=>x.nome===prodSelect.value);
- if(!p)return;
- let html=`<tr data-p="${p.nome}">
- <td><input type="checkbox" checked></td>
- <td>${p.nome}</td>
- <td><input class="small"> ${p.unidade}</td>`;
- nutrients.forEach(n=>html+=`<td>${p[n]??"—"}</td>`);
- html+=`<td class="remove" onclick="this.parentNode.remove();calc()">✕</td></tr>`;
- products.innerHTML+=html;
- prodSelect.value="";
- calc();
-};
-
-document.body.addEventListener("input",calc);
-document.body.addEventListener("change",calc);
-
-function calc(){
- const alvo={},total={};
- document.querySelectorAll("#targets tr[data-n]").forEach(r=>{
-  alvo[r.dataset.n]=parseFloat(r.querySelector("input").value)||0;
- });
- document.querySelectorAll("#products tr[data-p]").forEach(r=>{
-  if(!r.cells[0].querySelector("input").checked)return;
-  const dose=parseFloat(r.cells[2].querySelector("input").value)||0;
-  nutrients.forEach((n,i)=>{
-   const v=r.cells[3+i].innerText;
-   if(v!=="—"&&alvo[n]!=null)
-    total[n]=(total[n]||0)+dose*parseFloat(v);
+// ADICIONAR PRODUTO
+document.getElementById("prodSelect").addEventListener("change", function() {
+  const produtoNome = this.value;
+  if (!produtoNome) return;
+  
+  const produto = produtosLivres.find(p => p.nome === produtoNome);
+  if (!produto) return;
+  
+  const tbody = document.getElementById("productBody");
+  const tr = document.createElement("tr");
+  tr.className = "product-row";
+  tr.dataset.produto = produtoNome;
+  
+  const badge = produto.tipo === "macro-fisiologico" 
+    ? '<span class="badge badge-macro">Macro fisiológico</span>' 
+    : '';
+  
+  let composicao = '<div class="nutrient-grid">';
+  nutrients.forEach(n => {
+    if (produto[n]) {
+      composicao += `<div class="nutrient-value"><strong>${produto[n]}</strong><span>${n}</span></div>`;
+    }
   });
- });
- statusTb.innerHTML='<tr><th>Nutriente</th><th>Alvo</th><th>Entregue</th><th>Status</th></tr>';
- Object.keys(alvo).forEach(n=>{
-  const a=alvo[n],e=total[n]||0,p=a?e/a:0;
-  let cls="status-bad",t="🔴";
-  if(p>=1){cls="status-ok";t="🟢";}
-  else if(p>=0.8){cls="status-warn";t="🟡";}
-  statusTb.innerHTML+=
-  `<tr class="${cls}"><td>${n}</td><td>${a}</td><td>${e.toFixed(1)}</td><td>${t}</td></tr>`;
- });
+  composicao += '</div>';
+  
+  tr.innerHTML = `
+    <td class="checkbox-cell">
+      <input type="checkbox" checked onchange="calcular()">
+    </td>
+    <td>
+      <div class="product-name">
+        ${produto.nome}
+        ${badge}
+      </div>
+      ${composicao}
+    </td>
+    <td style="text-align: center;">
+      <input type="number" class="input-small" min="0" step="0.1" placeholder="0" oninput="calcular()">
+      <div style="font-size: 0.75em; color: #86868B; margin-top: 4px;">${produto.unidade}</div>
+    </td>
+    <td style="text-align: center;">
+      <button class="btn-remove" onclick="removeProduct(this)">×</button>
+    </td>
+  `;
+  
+  tbody.appendChild(tr);
+  document.getElementById("productEmpty").style.display = "none";
+  document.getElementById("productTable").style.display = "table";
+  this.value = "";
+  calcular();
+});
+
+function removeTarget(btn) {
+  btn.closest("tr").remove();
+  if (document.getElementById("targetBody").children.length === 0) {
+    document.getElementById("targetEmpty").style.display = "block";
+  }
+  calcular();
 }
 
-function exportPDF(){
- html2pdf().from(document.body).set({
-  margin:10,filename:"Plano_Nutricional.pdf",
-  jsPDF:{unit:"mm",format:"a4"}
- }).save();
+function removeProduct(btn) {
+  btn.closest("tr").remove();
+  if (document.getElementById("productBody").children.length === 0) {
+    document.getElementById("productEmpty").style.display = "block";
+    document.getElementById("productTable").style.display = "none";
+  }
+  calcular();
 }
 
-function showPage(p){
- planPage.classList.toggle("hidden",p!=="plan");
- productsPage.classList.toggle("hidden",p!=="products");
+function calcular() {
+  const alvos = {};
+  document.querySelectorAll("#targetBody tr").forEach(tr => {
+    const nutriente = tr.dataset.nutrient;
+    const valor = parseFloat(tr.querySelector("input").value) || 0;
+    alvos[nutriente] = valor;
+  });
+  
+  const entregue = {};
+  document.querySelectorAll("#productBody tr").forEach(tr => {
+    const checkbox = tr.querySelector('input[type="checkbox"]');
+    if (!checkbox.checked) return;
+    
+    const dose = parseFloat(tr.querySelector('input[type="number"]').value) || 0;
+    const produtoNome = tr.dataset.produto;
+    const produto = produtosLivres.find(p => p.nome === produtoNome);
+    
+    if (produto && dose > 0) {
+      nutrients.forEach(n => {
+        if (produto[n]) {
+          entregue[n] = (entregue[n] || 0) + (dose * produto[n]);
+        }
+      });
+    }
+  });
+  
+  const resultBody = document.getElementById("resultBody");
+  resultBody.innerHTML = "";
+  
+  if (Object.keys(alvos).length === 0) {
+    document.getElementById("resultEmpty").style.display = "block";
+    return;
+  }
+  
+  document.getElementById("resultEmpty").style.display = "none";
+  
+  Object.keys(alvos).forEach(nutriente => {
+    const alvo = alvos[nutriente];
+    const entrega = entregue[nutriente] || 0;
+    const excesso = entrega - alvo;
+    const percentual = alvo > 0 ? (entrega / alvo) : 0;
+    
+    let status = "🔴";
+    let statusClass = "status-bad";
+    
+    if (percentual >= 1.0) {
+      status = "🟢";
+      statusClass = "status-ok";
+    } else if (percentual >= 0.8) {
+      status = "🟡";
+      statusClass = "status-warn";
+    }
+    
+    if (alvo === 0) {
+      statusClass = "status-neutral";
+      status = "—";
+    }
+    
+    const excessoFormatado = excesso >= 0 
+      ? `+${excesso.toFixed(1)}` 
+      : excesso.toFixed(1);
+    
+    const excessoColor = excesso >= 0 ? '#2E7D32' : '#C62828';
+    
+    const tr = document.createElement("tr");
+    tr.className = statusClass;
+    tr.innerHTML = `
+      <td class="nutrient-col">${nutriente}</td>
+      <td class="value-col">${alvo.toFixed(1)} g/ha</td>
+      <td class="value-col">${entrega.toFixed(1)} g/ha</td>
+      <td class="value-col" style="color: ${excessoColor}; font-weight: 600;">${excessoFormatado} g/ha</td>
+      <td class="status-col">${status}</td>
+    `;
+    resultBody.appendChild(tr);
+  });
 }
 
-refreshProducts();
+function exportPDF() {
+  const element = document.getElementById('tab-plano');
+  const opt = {
+    margin: 10,
+    filename: 'Plano_Nutricional.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 3 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  html2pdf().set(opt).from(element).save();
+}
+
+// ========== GERENCIAR PRODUTOS ==========
+
+function loadAdminProducts() {
+  produtosLivres = JSON.parse(localStorage.getItem('produtosLivres') || '[]');
+  const tbody = document.getElementById('adminProductBody');
+  tbody.innerHTML = '';
+  
+  if (produtosLivres.length === 0) {
+    document.getElementById('adminEmptyState').style.display = 'block';
+    document.getElementById('adminProductTable').style.display = 'none';
+    return;
+  }
+  
+  document.getElementById('adminEmptyState').style.display = 'none';
+  document.getElementById('adminProductTable').style.display = 'table';
+  
+  produtosLivres.forEach((produto, index) => {
+    const tr = document.createElement('tr');
+    
+    const badge = produto.tipo === 'macro-fisiologico' 
+      ? '<span class="badge badge-macro">Macro fisiológico</span>' 
+      : '';
+    
+    let composicao = '<div class="nutrient-values">';
+    nutrients.forEach(n => {
+      if (produto[n]) {
+        composicao += `<span class="nutrient-chip">${n}: ${produto[n]}</span>`;
+      }
+    });
+    composicao += '</div>';
+    
+    tr.innerHTML = `
+      <td>
+        <div class="product-name">${produto.nome} ${badge}</div>
+        <div class="product-unit">${produto.unidade}</div>
+      </td>
+      <td>${composicao}</td>
+      <td style="text-align: center;">
+        <div class="action-buttons">
+          <button class="btn-edit" onclick="editProduct(${index})">Editar</button>
+          <button class="btn-delete" onclick="deleteProduct(${index})">Excluir</button>
+        </div>
+      </td>
+    `;
+    
+    tbody.appendChild(tr);
+  });
+}
+
+function openModal() {
+  document.getElementById('productModal').classList.add('active');
+  document.getElementById('modalTitle').textContent = 'Novo Produto';
+  document.getElementById('productForm').reset();
+  document.getElementById('editIndex').value = '';
+  document.getElementById('btnSave').textContent = 'Salvar Produto';
+}
+
+function closeModal() {
+  document.getElementById('productModal').classList.remove('active');
+}
+
+function editProduct(index) {
+  const produtos = JSON.parse(localStorage.getItem('produtosLivres'));
+  const produto = produtos[index];
+  
+  document.getElementById('modalTitle').textContent = 'Editar Produto';
+  document.getElementById('editIndex').value = index;
+  document.getElementById('nomeProduto').value = produto.nome;
+  document.getElementById('unidadeProduto').value = produto.unidade;
+  document.getElementById('macroFisiologico').checked = produto.tipo === 'macro-fisiologico';
+  document.getElementById('btnSave').textContent = 'Atualizar Produto';
+  
+  nutrients.forEach(n => {
+    const input = document.getElementById(`nutrient_${n}`);
+    if (input) {
+      input.value = produto[n] || '';
+    }
+  });
+  
+  document.getElementById('productModal').classList.add('active');
+}
+
+function saveProduct(event) {
+  event.preventDefault();
+  
+  const produtos = JSON.parse(localStorage.getItem('produtosLivres'));
+  const editIndex = document.getElementById('editIndex').value;
+  
+  const produto = {
+    nome: document.getElementById('nomeProduto').value,
+    unidade: document.getElementById('unidadeProduto').value
+  };
+  
+  if (document.getElementById('macroFisiologico').checked) {
+    produto.tipo = 'macro-fisiologico';
+  }
+  
+  nutrients.forEach(n => {
+    const value = parseFloat(document.getElementById(`nutrient_${n}`).value);
+    if (value && value > 0) {
+      produto[n] = value;
+    }
+  });
+  
+  if (editIndex !== '') {
+    produtos[parseInt(editIndex)] = produto;
+  } else {
+    produtos.push(produto);
+  }
+  
+  localStorage.setItem('produtosLivres', JSON.stringify(produtos));
+  closeModal();
+  loadAdminProducts();
+  refreshProductDropdown();
+}
+
+function deleteProduct(index) {
+  if (!confirm('Tem certeza que deseja excluir este produto?')) {
+    return;
+  }
+  
+  const produtos = JSON.parse(localStorage.getItem('produtosLivres'));
+  produtos.splice(index, 1);
+  localStorage.setItem('produtosLivres', JSON.stringify(produtos));
+  loadAdminProducts();
+  refreshProductDropdown();
+}
+
+document.getElementById('productModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeModal();
+  }
+});
+
+// Inicializar carregamento de produtos
+loadAdminProducts();
+calcular();
 </script>
 
 </body>
